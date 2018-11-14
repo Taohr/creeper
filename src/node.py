@@ -70,7 +70,9 @@ class Dijkstra(object):
         return None
 
     def run(self, node1, node2):
-        path = []
+        if not self.grid:
+            return []
+
         vmap = {}
         left = [node1]
         nodes = list(set([c.a for c in self.grid]).union(set([c.b for c in self.grid])))
@@ -81,6 +83,8 @@ class Dijkstra(object):
                 else:
                     vmap[node.nid] = {'d': Inf, 'from': None}
                     left.append(node)
+
+        path = []
         while left:
             cur = min(left, key=lambda v: vmap[v.nid]['d'])
             if cur == node2:
@@ -94,6 +98,10 @@ class Dijkstra(object):
                 d = vmap[cur.nid]['d'] + c.d
                 if d < vmap[l.nid]['d']:
                     vmap[l.nid] = {'d': d, 'from': cur}
+
+        if not path:
+            return []
+
         while True:
             pre = vmap[path[-1].nid]['from']
             if pre:

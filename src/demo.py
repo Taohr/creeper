@@ -33,6 +33,7 @@ screen = 0 # screen
 mouse = 0 # mouse icon
 points = [] # mouse click, add circle
 path = []
+dijkstra = Dijkstra()
 
 def distance(p1, p2):
     dx = p1[0] - p2[0]
@@ -94,7 +95,15 @@ def touch_end(e):
     begin_point = 0
     move_point = 0
     # points.append(e['pos'])
-    points.append(Node(e['pos']))
+    node = Node(e['pos'])
+    for p in points:
+        d = distance(p.pos, node.pos)
+        if d < 100:
+            c = Connection(p, node, d)
+            dijkstra.add(c)
+    points.append(node)
+    global path
+    path = dijkstra.run(points[0], points[-1])
     pass
 
 def draw_mouse():
@@ -133,6 +142,10 @@ def update_game(updates):
         p = node.pos
         if distance(mouse, p) < 12:
             pygame.draw.circle(screen, RED, p, 10, 3)
+    for i in range(len(path)-1):
+        n1 = path[i]
+        n2 = path[i+1]
+        pygame.draw.line(screen, BLUE, n1.pos, n2.pos, 3)
     pygame.display.flip()
     dirty = updates.draw(screen)
     pygame.display.update(dirty)
